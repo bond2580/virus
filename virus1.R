@@ -4,11 +4,13 @@
 library(xts)
 library(deSolve)
 
-start <- 149 #2020年7月1日
-end <- 321 #2020年12月20日
+start <- 139 #2020年7月1日
+end <- 381 #2021年1月31日
+span <- 14 #予測期間
 
-covid <- read.csv("COVID-19 (6).csv")
-ans <- sim(start, end, 7) #過去の最適パラメータを予測
+
+covid <- read.csv("COVID-19.csv")
+ans <- sim(start, end, span) #過去の最適パラメータを予測
 dates <- seq(as.Date("2020-07-01"), length=nrow(ans), by="days")
 ans_xts <- as.xts(ans[, -1], order.by = dates)
 
@@ -25,9 +27,9 @@ dev.off()
 png("spectrum.png", width = 959, height = 605) #過去の最適パラメータの周波数スペクトルをプロット
 oldpar <- par(no.readonly = TRUE)
 par(mfrow = c(2,2),par(mar=c(0,0,0,0)),par(mar=c(4,4,3,1)))
-plot.spectrum(ans_xts$R0, lab="日", main="R0の周波数スペクトル", col="red")
-plot.spectrum(ans_xts$e, lab="日", main="eの周波数スペクトル", col="green")
-plot.spectrum(ans_xts$l, lab="日", main="lの周波数スペクトル", col="blue")
+plot.spectrum(ans_xts$R0, lab="days", main="R0", col="red")
+plot.spectrum(ans_xts$e, lab="days", main="e", col="darkgreen")
+plot.spectrum(ans_xts$l, lab="days", main="l", col="blue")
 par(oldpar)
 dev.off()
 

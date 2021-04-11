@@ -47,7 +47,7 @@ simS3 <- function(start, end){#Rの残差の最も小さくなるパラメータ
         r <- R2(covid$R[start:end], b[1:(end-start+1),5])
         if(s+r >= sbest){
           sbest <- s+r
-          ans <-data.frame(covid$日付[start], i/10, j, k, s, r, sbest)
+          ans <-data.frame(covid$date[start], i/10, j, k, s, r, sbest)
           colnames(ans) <- c("days","R0", "e", "l", "SR2", "RR2", "S+R")
         }
       }
@@ -57,7 +57,7 @@ simS3 <- function(start, end){#Rの残差の最も小さくなるパラメータ
 }
 
 
-sim <- function(start, end, span){　#最適パラメータの推測
+sim <- function(start, end, span){#最適パラメータの推測
   opt <- data.frame()
   for(i in start:end){
     opt <- rbind(opt, simS3(i, i+span))

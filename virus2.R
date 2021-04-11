@@ -1,28 +1,30 @@
 #未来の最適パラメータを予測してSEIRモデルで未来の流行を計算する
 
-span <- 14 #予測期間
 
-tmp <- as.xts(ans[,c(-1,-2)], order.by = dates)
+
+tmp <- as.xts(ans[,c(-1, -2)], order.by = dates)
 attr(tmp, 'frequency') <- 7
 
 #ホルトウィンタース法にによるパラメータ推測モデル
-HR0 <- HoltWinters(ans_xts$R0,gamma=FALSE) #周期性が確認できなかったため, gammma=FALSEとする. 
+HR0 <- HoltWinters(ans_xts$R0,
+                   gamma=FALSE
+                   ) #周期性が確認できなかったため, gammma=FALSEとする. 
 He <- HoltWinters(tmp$e)
 Hl <- HoltWinters(tmp$l)
 
 #12月28時点の最適パラメータを推測
-HR0 <- predict(HR0, n.ahead=8)
-He <- predict(He, n.ahead=8)
-Hl <- predict(Hl, n.ahead=8)
+HR0 <- predict(HR0, n.ahead=span+60)
+He <- predict(He, n.ahead=span+60)
+Hl <- predict(Hl, n.ahead=span+1)
 
 
-new <- FCUK(covid$S[end+8], covid$E[end+8], covid$I[end+8], covid$R[end+8], HR0[8],  He[8], Hl[8],span) #予測値
-valid = covid[(end+8):(end+8+span),] #実測値
+new <- FCUK(covid$S[end+span], covid$E[end+span], covid$I[end+span], covid$R[end+span], HR0[8],  He[8], Hl[8],span) #予測値
+valid = covid[(end+span):(end+span+span),] #実測値
 
-err_S <- abs(valid$S - new[,2])　#Susupectiveの誤差
-err_R <- abs(valid$R)            #Recoverdの誤差
+err_S <- abs(valid$S - new[,2])  #Susupectiveの誤差
+err_R <- abs(valid$R - new[,5]) #Recoverdの誤差
 
-dates2 <- seq(as.Date("2020-12-28"), length=nrow(valid), by="days")
+dates2 <- seq(as.Date("2021-3-01"), length=nrow(valid), by="days")
 
 png("predict.png", width = 959, height=610) #予測値と実測値, 誤差をプロット
 oldpar <- par(no.readonly = TRUE)
