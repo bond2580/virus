@@ -5,15 +5,15 @@ library(xts)
 library(deSolve)
 library(tictoc)
 
-start <- 139 #2020年7月1日
-span <- 28 #予測期間
-end <- 419-span #2021年3月31日
+start <- 139 #139は2020年7月1日を表すインデックスに相当
+span <- 28 #過去のデータの予測における予測期間
+end <- 419-span #419は2021年4月7日を表すインデックスに相当
 
 
 covid <- read.csv("COVID-19.csv")
 tic() #処理時間計測
 ans <- sim(start, end, span) #過去の最適パラメータを予測
-toc()
+toc() #処理時間表示
 dates <- seq(as.Date("2020-07-01"), length=nrow(ans), by="days")
 ans_xts <- as.xts(ans[, -1], order.by = dates)
 
