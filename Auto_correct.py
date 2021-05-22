@@ -73,6 +73,9 @@ element = browser.find_element_by_partial_link_text("recovery_total.csv")
 element.click()
 element = browser.find_element_by_partial_link_text("death_total.csv")
 element.click()
+element = browser.find_element_by_partial_link_text("pcr_positive_daily.csv")
+element.click()
+
 print("データダウンロード完了")
 
 # In[223]:
@@ -97,14 +100,24 @@ import pandas as pd
 
 #SEIRモデルによるCOVID-19の流行予測に必要な変数を作成
 Infected = pd.read_csv(download_fileName[0])
+Infected.columns = ["日付", "I"]
 Exposed = Infected
 Death = pd.read_csv(download_fileName[1])
-Recovery = pd.read_csv(download_fileName[2])
-
+Recovery = pd.read_csv(download_fileName[3])
+total = pd.read_csv(download_fileName[2])
 
 df = pd.merge(Infected, Death, how="inner", on="日付")
 df = pd.merge(df, Recovery, how="inner", on="日付")
 df = pd.merge(df, Exposed, how="inner", on="日付")
+
+
+#これまでの陽性者数の合計を求める
+tmp = 0
+s = []
+for i in total["PCR 検査陽性者数(単日)"]:
+    i = i+tmp
+    s.append(i)
+    tmp = i
 
 
 # In[226]:
@@ -112,7 +125,7 @@ df = pd.merge(df, Exposed, how="inner", on="日付")
 
 df.columns = ["date", "I", "death", "recover", "E"]
 df["R"] = df["death"] + df["recover"]
-df["S"] = 120000000 - df.I -df.E - df.R
+df["S"] = 120000000 - pd.DataFrame(s) #120000000は日本の総人口(出生, 死亡による変化はないものとする)
 
 
 # In[227]:
